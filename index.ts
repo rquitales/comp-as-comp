@@ -1,156 +1,173 @@
-import * as ts from "typescript";
-import * as path from "path";
+import * as pulumi from '@pulumi/pulumi';
+import * as aws from '@pulumi/aws';
 
-type SchemaProperty = {
-    type: string;
-    optional?: boolean;
+const config = new pulumi.Config();
+
+const repoArgs: aws.ecr.RepositoryArgs = {
+    encryptionConfigurations: config_getObjectOutput("encryptionConfigurations"),
+    forceDelete: config_getBooleanOutput("forceDelete"),
+    imageScanningConfiguration: config_getObjectOutput("imageScanningConfiguration"),
+    imageTagMutability: config_getOutput("imageTagMutability"),
+    name: config_getOutput("name"),
+    tags: config_getObjectOutput("tags"),
 };
 
-type ComponentSchema = {
-    inputs: Record<string, SchemaProperty>;
-    outputs: Record<string, SchemaProperty>;
-};
+// This would be much simpler but it doesn't work because of config values are returned
+// as strings, so the shape of the object doesn't match the args type.
+// const args = config_getAll() as ecr.RepositoryArgs;
+// pulumi.jsonStringify(args).apply(v => console.log('Config Args:', v));
 
-class ComponentAnalyzer {
-    private checker: ts.TypeChecker;
-    private program: ts.Program;
+const lowerCaseName = pulumi.getStack().toLowerCase();
+const lifecyclePolicy = config.getObject<lifecyclePolicyInputs>("lifecyclePolicy")
 
-    constructor() {
-        const tsConfigPath = './tsconfig.json';
-        const config = ts.readConfigFile(tsConfigPath, ts.sys.readFile);
-        const parsedConfig = ts.parseJsonConfigFileContent(
-            config.config,
-            ts.sys,
-            path.dirname(tsConfigPath)
-        );
-        
-        this.program = ts.createProgram({
-            rootNames: parsedConfig.fileNames,
-            options: parsedConfig.options,
+const repository = new aws.ecr.Repository(lowerCaseName, repoArgs);
+
+let lifecyclePolicyRes = undefined;
+if (!lifecyclePolicy?.skip) {
+    lifecyclePolicyRes = new aws.ecr.LifecyclePolicy(
+        lowerCaseName,
+        {
+            repository: repository.name,
+            policy: buildLifecyclePolicy(lifecyclePolicy),
         });
-        this.checker = this.program.getTypeChecker();
-    }
-
-    public analyzeComponent(componentPath: string): ComponentSchema {       
-        const schema: ComponentSchema = {
-            inputs: {},
-            outputs: {}
-        };
-
-        const sourceFile = this.program.getSourceFile(componentPath);
-        if (!sourceFile) {
-            throw new Error(`Could not find source file: ${componentPath}`);
-        }
-
-        ts.forEachChild(sourceFile, (node) => {
-            if (ts.isClassDeclaration(node)) {
-                console.log('Found component class:', node.name?.text);
-                this.analyzeComponentClass(node, schema);
-            }
-        });
-
-        return schema;
-    }
-
-    private analyzeComponentClass(node: ts.ClassDeclaration, schema: ComponentSchema) {
-        // Analyze constructor args
-        const constructor = node.members.find(ts.isConstructorDeclaration);
-        if (constructor && constructor.parameters.length > 1) {
-            const argsParam = constructor.parameters[1];
-            const argsType = this.checker.getTypeAtLocation(argsParam);
-            
-            console.log('Analyzing inputs from constructor args type:', this.checker.typeToString(argsType));
-            
-            argsType.getProperties().forEach(prop => {
-                const propType = this.checker.getTypeOfSymbolAtLocation(prop, prop.valueDeclaration!);
-                const optional = !!(prop.flags & ts.SymbolFlags.Optional);
-                console.log(`Found input property: ${prop.name} of type ${this.getPulumiType(propType)} (optional: ${optional})`);
-                
-                schema.inputs[prop.name] = {
-                    type: this.getPulumiType(propType),
-                    optional: optional
-                };
-            });
-        }
-
-        // Get the type of the class itself
-        const classType = this.checker.getTypeAtLocation(node);
-        const properties = this.checker.getPropertiesOfType(classType);
-        console.log(`Found ${properties.length} properties on class`);
-        
-        properties.forEach(prop => {
-            if (prop.flags & ts.SymbolFlags.Method) return;
-            
-            const declaration = prop.valueDeclaration || prop.declarations?.[0];
-            if (!declaration) return;
-            
-            const propType = this.checker.getTypeOfSymbolAtLocation(prop, declaration);
-            const typeString = this.checker.typeToString(propType);
-            console.log(`Analyzing property ${prop.name} of type ${typeString}`);
-            
-            if (this.isPulumiOutput(propType)) {
-                schema.outputs[prop.name] = {
-                    type: this.getPulumiType(propType)
-                };
-                console.log(`Added output property: ${prop.name} of type ${this.getPulumiType(propType)}`);
-            }
-        });
-
-        // Filter out internal Pulumi properties
-        const internalProps = ['urn', 'id'];
-        internalProps.forEach(prop => {
-            delete schema.outputs[prop];
-        });
-    }
-
-    private isPulumiOutput(type: ts.Type): boolean {
-        const typeString = this.checker.typeToString(type);
-        const isOutput = typeString.includes('Output<') || typeString.includes('OutputInstance<');
-        console.log(`Checking if ${typeString} is Output: ${isOutput}`);
-        return isOutput;
-    }
-
-    private getPulumiType(type: ts.Type): string {
-        const typeString = this.checker.typeToString(type);
-        
-        // Handle both Output<T> and OutputInstance<T>
-        const match = typeString.match(/(?:Output|OutputInstance)<(.+)>/);
-        if (match) {
-            return match[1].toLowerCase();
-        }
-
-        // Handle Input<T>
-        const inputMatch = typeString.match(/Input<(.+)>/);
-        if (inputMatch) {
-            return inputMatch[1].toLowerCase();
-        }
-
-        // Handle primitive types
-        return typeString.toLowerCase();
-    }
 }
 
-const schema = new ComponentAnalyzer().analyzeComponent('./component.ts');
-console.log('Final Schema:', JSON.stringify(schema, null, 2));
+export const repositoryId = repository.id;
+export const lifecyclePolicyId = lifecyclePolicyRes?.id;
 
-// Prints:
-// {
-//     "inputs": {
-//       "input1": {
-//         "type": "string",
-//         "optional": false
-//       },
-//       "input2": {
-//         "type": "number",
-//         "optional": true
-//       }
-//     },
-//     "outputs": {
-//       "output1": {
-//         "type": "string"
-//       },
-//       "output2": {
-//         "type": "number"
-//       }
-//     }
-// }
+interface lifecyclePolicyRuleInputs {
+    readonly description?: pulumi.Input<string>;
+    readonly maximumAgeLimit?: pulumi.Input<number>;
+    readonly maximumNumberOfImages?: pulumi.Input<number>;
+    readonly tagPrefixList?: pulumi.Input<pulumi.Input<string>[]>;
+    readonly tagStatus: pulumi.Input<"any" | "untagged" | "tagged">;
+  }
+  
+  interface lifecyclePolicyInputs {
+    readonly rules?: pulumi.Input<pulumi.Input<lifecyclePolicyRuleInputs>[]>;
+    readonly skip?: boolean;
+  }
+
+  function buildLifecyclePolicy(
+    lifecyclePolicy: lifecyclePolicyInputs | undefined,
+  ): pulumi.Input<aws.ecr.LifecyclePolicyDocument> {
+    const rules = lifecyclePolicy?.rules;
+    if (!rules) {
+      return convertRules([
+        {
+          description: "remove untagged images",
+          tagStatus: "untagged",
+          maximumNumberOfImages: 1,
+        },
+      ]);
+    }
+    return pulumi.output(rules).apply((rules) => convertRules(rules));
+  }
+  
+  function convertRules(
+    rules: pulumi.Unwrap<lifecyclePolicyRuleInputs>[],
+  ): aws.ecr.LifecyclePolicyDocument {
+    const result: aws.ecr.LifecyclePolicyDocument = { rules: [] };
+  
+    const nonAnyRules = rules.filter((r) => r.tagStatus !== "any");
+    const anyRules = rules.filter((r) => r.tagStatus === "any");
+  
+    if (anyRules.length >= 2) {
+      throw new Error(`At most one [selection: "any"] rule can be provided.`);
+    }
+  
+    // Place the 'any' rule last so it has higest priority.
+    const orderedRules = [...nonAnyRules, ...anyRules];
+  
+    let rulePriority = 1;
+    for (const rule of orderedRules) {
+      result.rules.push(convertRule(rule, rulePriority));
+      rulePriority++;
+    }
+  
+    return result;
+  }
+  
+  function convertRule(
+    rule: pulumi.Unwrap<lifecyclePolicyRuleInputs>,
+    rulePriority: number,
+  ): aws.ecr.PolicyRule {
+    return {
+      rulePriority,
+      description: rule.description,
+      selection: { ...convertTag(), ...convertCount() },
+      action: { type: "expire" },
+    };
+  
+    function convertCount() {
+      if (rule.maximumNumberOfImages !== undefined) {
+        return {
+          countType: "imageCountMoreThan",
+          countNumber: rule.maximumNumberOfImages,
+          countUnit: undefined,
+        } as const;
+      } else if (rule.maximumAgeLimit !== undefined) {
+        return {
+          countType: "sinceImagePushed",
+          countNumber: rule.maximumAgeLimit,
+          countUnit: "days",
+        } as const;
+      } else {
+        throw new Error(
+          "Either [maximumNumberOfImages] or [maximumAgeLimit] must be provided with a rule.",
+        );
+      }
+    }
+  
+    function convertTag() {
+      if (rule.tagStatus === "any" || rule.tagStatus === "untagged") {
+        return { tagStatus: rule.tagStatus };
+      } else {
+        if (!rule.tagPrefixList || rule.tagPrefixList.length === 0) {
+          throw new Error("tagPrefixList cannot be empty.");
+        }
+  
+        return {
+          tagStatus: "tagged",
+          tagPrefixList: rule.tagPrefixList,
+        } as const;
+      }
+    }
+  }
+  
+
+function config_getAll(): object {
+    const config = pulumi.runtime.allConfig();
+    const projConfig = Object.fromEntries(
+        Object.entries(config)
+            .filter(([key]) => key.startsWith("comp-as-comp:"))       // Keep keys that start with the prefix
+            .map(([key, value]) => [key.slice("comp-as-comp:".length), value]) // Remove the prefix from the key
+    );
+    return { ...projConfig };
+}
+function config_getOutput(name: string): pulumi.Output<string> {
+    // TODO: Do we have to lie about the nullability of the output?
+    return pulumi.output(config.get(name)!);
+}
+function config_getBooleanOutput(name: string): pulumi.Output<boolean> {
+    // TODO: Do we have to lie about the nullability of the output?
+    return pulumi.output(config.getBoolean(name)!);
+}
+function config_getObjectOutput<T>(name: string): pulumi.Output<T> {
+    const v = config.getObject<T>(name);
+    // TODO: Do we have to lie about the nullability of the output?
+    return pulumi.output(v) as pulumi.Output<T>;
+}
+
+
+
+
+// import * as tls from "tls-self-signed-cert";
+
+// const cert = new tls.SelfSignedCertificate("mycert", {
+//     subject: {},
+//     dnsName: "example.com",
+//     validityPeriodHours: 24,
+//     localValidityPeriodHours: 24,
+// });
+// export const certPem = cert.pem;
