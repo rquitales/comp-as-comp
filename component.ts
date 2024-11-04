@@ -1,7 +1,9 @@
 import * as pulumi from "@pulumi/pulumi";
 
 class MyComponent extends pulumi.ComponentResource {
+    // Output 1 comment.
     public readonly output1: pulumi.Output<string>;
+    // Output 2 comment.
     public readonly output2: pulumi.Output<number>;
     
     constructor(name: string, args: MyComponentArgs, opts?: pulumi.ComponentResourceOptions) {
@@ -12,6 +14,8 @@ class MyComponent extends pulumi.ComponentResource {
 }
 
 interface MyComponentArgs {
+    /** The primary input string that will be processed */
     input1: pulumi.Input<string>;
+    // Input 2 comment.
     input2?: pulumi.Input<number>;
 }
