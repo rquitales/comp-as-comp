@@ -1,0 +1,7 @@
+packageDeclarationVersion: 1
+name: component
+version: 0.1.3
+parameterization:
+    name: tls-self-signed-cert
+    version: 0.1.3
+    value: L1VzZXJzL21pa2hhaWxzaGlsa292L2dvL3NyYy9naXRodWIuY29tL3B1bHVtaS9wbGF5L2NvbXAtYXMtY29tcC9wdWx1bWktdGxzLXNlbGYtc2lnbmVkLWNlcnQ=

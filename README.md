@@ -1,9 +1,9 @@
 # Consuming components via a parameterized provider
 
 ```sh
-$ cd program
+$ cd program-ts
 
-$ pulumi package add ../component <full path>/comp-as-comp/pulumi-tls-self-signed-cert
+$ pulumi package add ../component ../pulumi-tls-self-signed-cert
 Successfully generated a Nodejs SDK for the tls-self-signed-cert package at /Users/mikhailshilkov/go/src/github.com/pulumi/play/comp-as-comp/program/sdks/tls-self-signed-cert
 
 To use this SDK in your Nodejs project, run the following command:

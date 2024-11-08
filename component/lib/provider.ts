@@ -1,6 +1,7 @@
 // Copyright 2016-2024, Pulumi Corporation.
 
 import { readFileSync, writeFileSync } from "fs";
+import * as path from "path";
 import * as pulumi from "@pulumi/pulumi";
 import * as provider from "@pulumi/pulumi/provider";
 import { generateSchema, Schema } from "./schema";
@@ -44,19 +45,20 @@ class ComponentProvider implements provider.Provider {
         }
     }
 
-    async parameterize(path: string): Promise<pulumi.provider.ParameterizeResult> {
-        const packStr = readFileSync(`${path}/package.json`, {encoding: "utf-8"});
+    async parameterize(dir: string): Promise<pulumi.provider.ParameterizeResult> {
+        const absDir = path.resolve(dir)
+        const packStr = readFileSync(`${absDir}/package.json`, {encoding: "utf-8"});
         const pack = JSON.parse(packStr);    
-        const schema = generateSchema(pack, path);
+        const schema = generateSchema(pack, absDir);
         schema.parameterization = {
             baseProvider: {
                 name: "component",
                 version: this.version,
             },
-            parameter: Buffer.from(path, 'utf-8').toString('base64'),
+            parameter: Buffer.from(absDir, 'utf-8').toString('base64'),
         };
         this.schema = JSON.stringify(schema);
-        this.path = path;
+        this.path = absDir;
         return {
             name: schema.name,
             version: schema.version,
