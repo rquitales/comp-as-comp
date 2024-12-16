@@ -1,0 +1,14 @@
+setup.py
+pulumi_platform/__init__.py
+pulumi_platform/_utilities.py
+pulumi_platform/dynamo_table.py
+pulumi_platform/lambda_http_app.py
+pulumi_platform/provider.py
+pulumi_platform/pulumi-plugin.json
+pulumi_platform/py.typed
+pulumi_platform.egg-info/PKG-INFO
+pulumi_platform.egg-info/SOURCES.txt
+pulumi_platform.egg-info/dependency_links.txt
+pulumi_platform.egg-info/not-zip-safe
+pulumi_platform.egg-info/requires.txt
+pulumi_platform.egg-info/top_level.txt

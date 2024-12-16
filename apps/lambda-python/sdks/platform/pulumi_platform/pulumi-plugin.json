@@ -1,0 +1,5 @@
+{
+  "resource": true,
+  "name": "platform",
+  "server": "/Users/mikhailshilkov/go/src/github.com/pulumi/play/comp-as-comp/platform"
+}

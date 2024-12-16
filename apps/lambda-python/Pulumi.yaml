@@ -1,0 +1,11 @@
+name: lambda-python
+description: A minimal Python Pulumi program
+runtime:
+  name: python
+  options:
+    toolchain: pip
+    virtualenv: venv
+plugins:
+  providers:
+    - name: platform
+      path: ../../platform
