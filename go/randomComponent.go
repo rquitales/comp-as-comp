@@ -1,7 +1,6 @@
 package main
 
 import (
-	"github.com/pulumi/pulumi-go-provider/infer"
 	"github.com/pulumi/pulumi-random/sdk/v4/go/random"
 	"github.com/pulumi/pulumi/sdk/v3/go/pulumi"
 )
@@ -29,11 +28,6 @@ func (r *RandomComponent) Construct(ctx *pulumi.Context, name, typ string, args 
 
 	pArgs := &random.RandomPasswordArgs{
 		Length: args.Length,
-	}
-
-	config := infer.GetConfig[Config](ctx.Context())
-	if config.Scream != nil {
-		pArgs.Lower = pulumi.BoolPtr(*config.Scream)
 	}
 
 	password, err := random.NewRandomPassword(ctx, name+"-password", pArgs, pulumi.Parent(comp))
