@@ -1,0 +1,12 @@
+name: random-component-yaml
+description: A minimal Pulumi YAML program
+runtime: yaml
+plugins:
+  providers:
+    - name: random-component
+      path: ..
+resources:
+  myrandom:
+    type: random-component:RandomComponent
+    properties:
+      length: 10
