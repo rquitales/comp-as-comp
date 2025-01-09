@@ -10,3 +10,5 @@ resources:
     type: random-component:RandomComponent
     properties:
       length: 10
+outputs:
+  password: ${myrandom.password}
