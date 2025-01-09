@@ -1,0 +1,12 @@
+name: static-page-yaml
+description: A minimal Pulumi YAML program
+runtime: yaml
+plugins:
+  providers:
+    - name: xyz
+      path: ..
+resources:
+  mystaticpage:
+    type: xyz:StaticPage
+    properties:
+      indexContent: "<h1>Hello, World!</h1>"
