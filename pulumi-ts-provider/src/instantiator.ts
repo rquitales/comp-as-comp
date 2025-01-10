@@ -1,76 +1,47 @@
-function isPulumiComponent(componentClass: any): boolean {
-    // Check if the class extends ComponentResource
-    try {
-        let prototype = componentClass.prototype;
-        while (prototype) {
-            const constructor = prototype.constructor;
-            if (constructor.name === 'ComponentResource') {
-                return true;
-            }
-            prototype = Object.getPrototypeOf(prototype);
-        }
-    } catch (error) {
-        // If any error occurs during prototype chain traversal, assume it's not a Pulumi component
-        return false;
-    }
+import * as path from 'path';
+import { ComponentAnalyzer } from './analyzer';
 
-    return false;
-}
-
-export function hasPulumiComponents(moduleExports: any): boolean {
-    // Check all exports in the module
-    for (const key in moduleExports) {
-        const exportedItem = moduleExports[key];
-        
-        // Check if the export directly is a Pulumi component
-        if (isPulumiComponent(exportedItem)) {
-            return true;
-        }
-        
-        // Check nested exports if it's an object
-        if (typeof exportedItem === 'object' && exportedItem !== null) {
-            for (const nestedKey in exportedItem) {
-                if (isPulumiComponent(exportedItem[nestedKey])) {
-                    return true;
-                }
-            }
-        }
+async function findComponentFile(directoryPath: string, componentName: string): Promise<string | null> {
+    const analyzer = new ComponentAnalyzer(directoryPath);
+    
+    // Check if this component exists in the analyzed components
+    const components = analyzer.analyzeComponents();
+    if (!components[componentName]) {
+        return null;
     }
     
-    return false;
+    // Find the source file containing this component
+    const sourceFile = analyzer['program'].getSourceFiles().find(sf => 
+        !sf.fileName.includes('node_modules') && 
+        !sf.fileName.endsWith('.d.ts') &&
+        sf.getText().includes(`class ${componentName}`)
+    );
+    
+    return sourceFile ? sourceFile.fileName : null;
 }
 
-function findComponentClass(moduleExports: any, componentName: string): any {
-    // First try direct access
-    if (moduleExports[componentName]) {
-        const ComponentClass = moduleExports[componentName];
-        if (isPulumiComponent(ComponentClass)) {
-            return ComponentClass;
-        }
+export async function instantiateComponent(
+    directoryPath: string,
+    componentName: string,
+    name: string,
+    args: Record<string, any>,
+    options: any
+): Promise<any> {
+    const componentFile = await findComponentFile(directoryPath, componentName);
+    
+    if (!componentFile) {
+        throw new Error(`Component ${componentName} not found in any source files at ${directoryPath}`);
     }
-
-    // Search nested exports if not found directly
-    for (const key in moduleExports) {
-        const exportedItem = moduleExports[key];
-        if (typeof exportedItem === 'object' && exportedItem !== null) {
-            if (exportedItem[componentName] && isPulumiComponent(exportedItem[componentName])) {
-                return exportedItem[componentName];
-            }
-        }
-    }
-
-    return null;
-} 
-
-export async function instantiateComponent(moduleExports: any, componentName: string,
-    name: string, args: Record<string, any>, options: any): Promise<any> {
-    const ComponentClass = findComponentClass(moduleExports, componentName);        
-    if (!ComponentClass) {
-        throw new Error(`Component ${componentName} not found in the provided module`);
-    }
-
+    
     try {
-        // Create a new instance with the provided args
+        const relativePath = path.relative(__dirname, componentFile);
+        const module = await import(relativePath);
+        const ComponentClass = module[componentName];
+        
+        if (!ComponentClass) {
+            throw new Error(`Component ${componentName} found in ${componentFile} but could not be imported`);
+        }
+        
         return new ComponentClass(name, args, options);
     } catch (error) {
         const errorMessage = error instanceof Error ? error.message : String(error);

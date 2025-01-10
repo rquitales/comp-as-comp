@@ -28,7 +28,7 @@ class ComponentProvider implements provider.Provider {
     pack: any;
     version: string;
     path: string;
-    constructor(readonly dir: string, readonly reqRequest: any) {
+    constructor(readonly dir: string) {
         const absDir = path.resolve(dir)
         const packStr = readFileSync(`${absDir}/package.json`, {encoding: "utf-8"});
         this.pack = JSON.parse(packStr);
@@ -44,7 +44,7 @@ class ComponentProvider implements provider.Provider {
     async construct(name: string, type: string, inputs: pulumi.Inputs,
         options: pulumi.ComponentResourceOptions): Promise<provider.ConstructResult> {
         const className = type.split(":")[2];
-        const comp = await instantiateComponent(this.reqRequest, className, name, inputs, options);
+        const comp = await instantiateComponent(this.path, className, name, inputs, options);
         return {
             urn: comp.urn,
             state: getInputsFromOutputs(comp),
@@ -52,8 +52,26 @@ class ComponentProvider implements provider.Provider {
     }
 }
 
-export function componentProviderHost(path: string, reqRequest: any): Promise<void> {
+export function componentProviderHost(dirname?: string): Promise<void> {
     const args = process.argv.slice(2);
-    const prov = new ComponentProvider(path, reqRequest);
+    // If dirname is not provided, get it from the call stack
+    if (!dirname) {
+        // Get the stack trace
+        const stack = new Error().stack;
+        // Parse the stack to get the caller's file
+        // Stack format is like:
+        // Error
+        //     at componentProviderHost (.../src/index.ts:3:16)
+        //     at Object.<anonymous> (.../caller/index.ts:4:1)
+        const callerLine = stack?.split('\n')[2];
+        const match = callerLine?.match(/\((.+):[0-9]+:[0-9]+\)/);
+        if (match && match[1]) {
+            dirname = path.dirname(match[1]);
+        } else {
+            throw new Error('Could not determine caller directory');
+        }
+    }
+
+    const prov = new ComponentProvider(dirname);
     return provider.main(prov, args);
 }
