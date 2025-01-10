@@ -5,3 +5,5 @@
 **/.DS_Store
 schema-*.json
 **/pulumi-resource-*
+.vscode/
+pulumi-ts-provider/dist
