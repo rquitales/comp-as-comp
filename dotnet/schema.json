@@ -1,0 +1,50 @@
+{
+    "name": "my-component",
+    "resources": {
+        "my-component:index:Component": {
+            "isComponent": true,
+            "inputProperties": {
+                "length": {
+                    "type": "string"
+                }
+            },
+            "requiredInputs": [
+                "length"
+            ],
+            "properties": {
+                "password": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "password"
+            ]
+        }
+    },
+    "language": {
+        "csharp": {
+            "packageReferences": {
+                "Pulumi": "3.*",
+                "Pulumi.Random": "4.*"
+            }
+        },
+        "go": {
+            "generateResourceContainerTypes": true,
+            "importBasePath": "github.com/pulumi/pulumi-my-component/sdk/go/my-component"
+        },
+        "nodejs": {
+            "dependencies": {
+                "pulumi-random": "^4.16.8"
+            },
+            "devDependencies": {
+                "typescript": "^3.7.0"
+            }
+        },
+        "python": {
+            "requires": {
+                "pulumi": ">=3.0.0,<4.0.0",
+                "pulumi_random": "^4.16.8"
+            }
+        }
+    }
+}
