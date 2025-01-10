@@ -52,8 +52,8 @@ interface Schema {
 }
 
 
-function generateComponent(pkg: string, component: analyzer.ComponentSchema): schema.ResourceSpec {
-    const result: schema.ResourceSpec = {
+function generateComponent(pkg: string, component: analyzer.ComponentSchema): schema.ResourceDefinition {
+    const result: schema.ResourceDefinition = {
         isComponent: true,
         description: component.description,
         inputProperties: {},
@@ -79,8 +79,8 @@ function generateComponent(pkg: string, component: analyzer.ComponentSchema): sc
     return result;
 }
 
-export function generateSchema(pack: any, path: string): schema.PackageSpec {
-    const result: schema.PackageSpec = {
+export function generateSchema(pack: any, path: string): schema.PulumiPackage {
+    const result: schema.PulumiPackage = {
         name: pack.name,
         displayName: pack.description,
         pluginDownloadURL: path,
@@ -103,9 +103,9 @@ export function generateSchema(pack: any, path: string): schema.PackageSpec {
         result.resources![tok] = generateComponent(pack.name, components[component]);
         for (const type in components[component].typeDefinitions) {
             const typeDef = components[component].typeDefinitions[type];
-            const typ: schema.ObjectTypeSpec = {
+            const typ: schema.TypeDefinition = {
                 type: "object",
-                properties: typeDef.properties as Record<string, schema.PropertySpec>,
+                properties: typeDef.properties as Record<string, schema.PropertyDefinition>,
                 required: Object.keys(typeDef.properties).filter((k) => !typeDef.properties[k].optional),
             };
             for (const propName in typeDef.properties) {
@@ -118,14 +118,14 @@ export function generateSchema(pack: any, path: string): schema.PackageSpec {
     return result;
 }
 
-function generateProperty(pkg: string, inputSchema: analyzer.SchemaProperty): schema.PropertySpec {
+function generateProperty(pkg: string, inputSchema: analyzer.SchemaProperty): schema.PropertyDefinition {
     let type = inputSchema.type;
-    let items: schema.TypeSpec | undefined = undefined;
+    let items: schema.TypeDefinition | undefined = undefined;
     let ref = undefined;
     if (inputSchema.ref) {
         ref = `#/types/${pkg}:index:${inputSchema.ref}`;
     } else if (type && type.endsWith("[]")) {
-        items = { type: type.slice(0, -2) };
+        items = { type: type.slice(0, -2) as schema.Type };
         type = "array";
     }
     return {
