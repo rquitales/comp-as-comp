@@ -23,7 +23,7 @@ public class TestProviderImpl : Provider
 
     public override Task<GetSchemaResponse> GetSchema(GetSchemaRequest request, CancellationToken ct)
     {
-        string currentFilePath = new System.Diagnostics.StackTrace(true).GetFrame(0).GetFileName();
+        string currentFilePath = new System.Diagnostics.StackTrace(true).GetFrame(0)!.GetFileName()!;
         string currentDirectory = Path.GetDirectoryName(currentFilePath)!;
         var schemaPath = Path.Combine(currentDirectory, "schema.json");
         return Task.FromResult(new GetSchemaResponse

@@ -26,7 +26,7 @@ func Provider() p.Provider {
 				"python": map[string]any{
 					"requires": map[string]any{
 						"pulumi":        ">=3.0.0,<4.0.0",
-						"pulumi_random": "^4.16.8",
+						"pulumi_random": ">=4.0.0,<5.0.0",
 					},
 					"respectSchemaVersion": true,
 				},
