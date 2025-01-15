@@ -83,7 +83,6 @@ export function generateSchema(pack: any, path: string): schema.PulumiPackage {
     const result: schema.PulumiPackage = {
         name: pack.name,
         displayName: pack.description,
-        pluginDownloadURL: path,
         version: pack.version,
         resources: {},
         types: {},

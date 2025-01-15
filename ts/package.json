@@ -13,7 +13,7 @@
         "typescript": "^4.0.0"
     },
     "scripts": {
-        "preinstall": "cd pulumi-ts-provider && tsc",
+        "preinstall": "cd pulumi-ts-provider && yarn install && tsc",
         "gen": "ts-node index.ts --gen",
         "start": "ts-node index.ts"
     }
