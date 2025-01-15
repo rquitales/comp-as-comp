@@ -4,15 +4,15 @@ This repository contains examples of how to author Pulumi components using sourc
 
 The examples are work-in-progress and will be updated over time as the core Pulumi functionality evolves.
 
-## pulumi-ts-provider
-
-A very early prototype of a high-level provider authoring library for TypeScript comparable to `pulumi-go-provider` for Go. Includes automatic schema inference from the component's source code.
-
 ## Examples
 
 ### TypeScript
 
 The `ts` directory contains a simple TypeScript component that creates a TLS self-signed certificate. It illustrates a forward-looking approach where a bunch of machinery is abstracted away, currently into the `pulumi-ts-provider` folder. The `example` folder contains a Pulumi YAML program that consumes the component.
+
+#### `ts/pulumi-ts-provider`
+
+A very early prototype of a high-level provider authoring library for TypeScript comparable to `pulumi-go-provider` for Go. Includes automatic schema inference from the component's source code.
 
 ### Python
 
