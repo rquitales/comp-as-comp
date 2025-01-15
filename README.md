@@ -20,7 +20,7 @@ The `py` directory contains a simple Python component that creates an AWS Static
 
 ### Go
 
-The `go` directory contains a simple Go component that creates a sample Random component. The `example` folder contains a Pulumi YAML program that consumes the component. It's currently required to build the component with `go build` before it can be used.
+The `go` directory contains a simple Go component that creates a sample Random component. The `example` folder contains a Pulumi YAML program that consumes the component.
 
 ### .NET
 
