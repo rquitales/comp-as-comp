@@ -9,7 +9,7 @@
   ],
   "scripts": {
     "build": "tsc",
-    "prepare": "npm run build"
+    "prepare": "tsc"
   },
   "devDependencies": {
     "@types/node": "^18.0.0",
