@@ -94,6 +94,15 @@ export function generateSchema(pack: any, path: string): schema.PulumiPackage {
                 },
                 respectSchemaVersion: true,
             },
+            python: {
+                respectSchemaVersion: true,
+            },
+            csharp: {
+                respectSchemaVersion: true,
+            },
+            go: {
+                respectSchemaVersion: true,
+            },
         },
     };
     const components = new analyzer.ComponentAnalyzer(path).analyzeComponents();    

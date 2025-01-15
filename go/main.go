@@ -19,6 +19,24 @@ func Provider() p.Provider {
 					},
 					"respectSchemaVersion": true,
 				},
+				"go": map[string]any{
+					"generateResourceContainerTypes": true,
+					"respectSchemaVersion":           true,
+				},
+				"python": map[string]any{
+					"requires": map[string]any{
+						"pulumi":        ">=3.0.0,<4.0.0",
+						"pulumi_random": "^4.16.8",
+					},
+					"respectSchemaVersion": true,
+				},
+				"csharp": map[string]any{
+					"packageReferences": map[string]any{
+						"Pulumi":        "3.*",
+						"Pulumi.Random": "4.*",
+					},
+					"respectSchemaVersion": true,
+				},
 			},
 		},
 	})

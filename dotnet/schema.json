@@ -27,11 +27,13 @@
             "packageReferences": {
                 "Pulumi": "3.*",
                 "Pulumi.Random": "4.*"
-            }
+            },
+            "respectSchemaVersion": true
         },
         "go": {
             "generateResourceContainerTypes": true,
-            "importBasePath": "github.com/pulumi/pulumi-my-component/sdk/go/my-component"
+            "importBasePath": "github.com/pulumi/pulumi-my-component/sdk/go/my-component",
+            "respectSchemaVersion": true
         },
         "nodejs": {
             "dependencies": {
@@ -46,7 +48,8 @@
             "requires": {
                 "pulumi": ">=3.0.0,<4.0.0",
                 "pulumi_random": "^4.16.8"
-            }
+            },
+            "respectSchemaVersion": true
         }
     }
 }
