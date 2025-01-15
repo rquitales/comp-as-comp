@@ -6,7 +6,7 @@
             "isComponent": true,
             "inputProperties": {
                 "length": {
-                    "type": "string"
+                    "type": "number"
                 }
             },
             "requiredInputs": [
