@@ -1,5 +1,6 @@
 {
     "name": "my-component",
+    "version": "0.1.0",
     "resources": {
         "my-component:index:Component": {
             "isComponent": true,
