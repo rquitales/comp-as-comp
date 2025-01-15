@@ -34,7 +34,7 @@
         },
         "nodejs": {
             "dependencies": {
-                "pulumi-random": "^4.16.8"
+                "@pulumi/random": "^4.16.8"
             },
             "devDependencies": {
                 "typescript": "^3.7.0"
