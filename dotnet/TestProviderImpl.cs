@@ -1,13 +1,13 @@
-using System.Threading;
-using System.Threading.Tasks;
-using Pulumi.Experimental.Provider;
 using System;
+using System.IO;
 using System.Linq;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Threading;
+using System.Threading.Tasks;
 using Pulumi;
+using Pulumi.Experimental.Provider;
 using Pulumi.Utilities;
-using System.IO;
 
 public class TestProviderImpl : Provider
 {
@@ -23,9 +23,12 @@ public class TestProviderImpl : Provider
 
     public override Task<GetSchemaResponse> GetSchema(GetSchemaRequest request, CancellationToken ct)
     {
+        string currentFilePath = new System.Diagnostics.StackTrace(true).GetFrame(0).GetFileName();
+        string currentDirectory = Path.GetDirectoryName(currentFilePath)!;
+        var schemaPath = Path.Combine(currentDirectory, "schema.json");
         return Task.FromResult(new GetSchemaResponse
         {
-            Schema = File.ReadAllText("../schema.json"),
+            Schema = File.ReadAllText(schemaPath),
         });
     }
 
