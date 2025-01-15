@@ -39,7 +39,8 @@
             },
             "devDependencies": {
                 "typescript": "^3.7.0"
-            }
+            },
+            "respectSchemaVersion": true
         },
         "python": {
             "requires": {
