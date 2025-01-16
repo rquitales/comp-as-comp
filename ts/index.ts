@@ -1,3 +1,4 @@
 import { componentProviderHost } from "pulumi-ts-provider";
 
-componentProviderHost();
+declare const __dirname: string;
+componentProviderHost(__dirname);
