@@ -15,7 +15,7 @@ export class SelfSignedCertificate extends pulumi.ComponentResource {
     public readonly caCert: pulumi.Output<string>;
 
     constructor(name: string, args: SelfSignedCertificateArgs, opts?: pulumi.ComponentResourceOptions) {
-        super("tls-self-signed-cert:index:SelfSignedCertificate", name, args, opts);
+        super("node-components:index:SelfSignedCertificate", name, args, opts);
 
         const algorithm = args.algorithm || "RSA";
         const rsaBits = args.rsaBits || 2048;

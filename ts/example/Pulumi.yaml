@@ -2,11 +2,11 @@ name: cert-component-yaml
 runtime: yaml
 plugins:
   providers:
-    - name: tls-self-signed-cert
+    - name: node-components
       path: ..
 resources:
   mycert:
-    type: tls-self-signed-cert:SelfSignedCertificate
+    type: node-components:SelfSignedCertificate
     properties:
       dnsName: example.com
       validityPeriodHours: 24

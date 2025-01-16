@@ -1,6 +1,6 @@
 {
-    "name": "tls-self-signed-cert",
-    "description": "Self Signed Certificate",
+    "name": "node-components",
+    "description": "Node Sample Components",
     "version": "0.1.3",
     "dependencies": {
         "@pulumi/pulumi": "^3.144.0",
