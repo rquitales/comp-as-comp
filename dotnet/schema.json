@@ -1,8 +1,8 @@
 {
-    "name": "my-component",
+    "name": "dotnet-components",
     "version": "0.1.0",
     "resources": {
-        "my-component:index:Component": {
+        "dotnet-components:index:RandomComponent": {
             "isComponent": true,
             "inputProperties": {
                 "length": {
@@ -32,7 +32,7 @@
         },
         "go": {
             "generateResourceContainerTypes": true,
-            "importBasePath": "github.com/pulumi/pulumi-my-component/sdk/go/my-component",
+            "importBasePath": "github.com/pulumi/pulumi-dotnet-components/sdk/go/dotnet-components",
             "respectSchemaVersion": true
         },
         "nodejs": {

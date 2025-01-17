@@ -3,11 +3,11 @@ description: A minimal Pulumi YAML program
 runtime: yaml
 plugins:
   providers:
-    - name: random-component
+    - name: go-components
       path: ..
 resources:
   myrandom:
-    type: random-component:RandomComponent
+    type: go-components:RandomComponent
     properties:
       length: 10
 outputs:

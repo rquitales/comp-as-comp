@@ -3,10 +3,10 @@ description: A minimal Pulumi YAML program
 runtime: yaml
 plugins:
   providers:
-    - name: xyz
+    - name: python-components
       path: ..
 resources:
   mystaticpage:
-    type: xyz:StaticPage
+    type: python-components:StaticPage
     properties:
       indexContent: "<h1>Hello, World!</h1>"

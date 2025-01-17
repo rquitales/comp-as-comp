@@ -2,11 +2,11 @@ name: my-component-yaml
 runtime: yaml
 plugins:
   providers:
-    - name: my-component
+    - name: dotnet-components 
       path: ..
 resources:
   myrandom:
-    type: my-component:Component
+    type: dotnet-components:RandomComponent
     properties:
       length: 10
 outputs:

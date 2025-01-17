@@ -15,8 +15,8 @@ public class TestProviderImpl : Provider
     {
         return request.Type switch
         {
-            "my-component:index:Component" => Construct<ComponentArgs, Component>(request,
-                (name, args, options) => Task.FromResult(new Component(name, args, options))),
+            "dotnet-components:index:RandomComponent" => Construct<RandomComponentArgs, RandomComponent>(request,
+                (name, args, options) => Task.FromResult(new RandomComponent(name, args, options))),
             _ => throw new NotImplementedException()
         };
     }

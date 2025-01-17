@@ -21,7 +21,7 @@ class Provider(provider.Provider):
                   inputs: Inputs,
                   options: Optional[ResourceOptions] = None) -> ConstructResult:
 
-        if resource_type == 'xyz:index:StaticPage':
+        if resource_type == 'python-components:index:StaticPage':
             return _construct_static_page(name, inputs, options)
 
         raise Exception(f'Unknown resource type {resource_type}')

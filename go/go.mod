@@ -1,4 +1,4 @@
-module github.com/pulumi/play/comp-as-comp/pulumi-resource-random-component
+module github.com/pulumi/play/comp-as-comp/pulumi-resource-go-components
 
 go 1.23.3
 

@@ -43,5 +43,5 @@ func Provider() p.Provider {
 }
 
 func main() {
-	p.RunProvider("random-component", "0.1.0", Provider())
+	p.RunProvider("go-components", "0.1.0", Provider())
 }
