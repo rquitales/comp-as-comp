@@ -6,4 +6,4 @@
 schema-*.json
 **/pulumi-resource-*
 .vscode/
-**/dist/
+
