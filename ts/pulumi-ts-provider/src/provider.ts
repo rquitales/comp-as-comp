@@ -52,6 +52,12 @@ class ComponentProvider implements provider.Provider {
     }
 }
 
+export async function testSchema(): Promise<void> {
+    const prov = new ComponentProvider(".");
+    const schema = await prov.getSchema();
+    console.log(JSON.stringify(JSON.parse(schema), null, 2));
+}
+
 export function componentProviderHost(dirname?: string): Promise<void> {
     const args = process.argv.slice(2);
     // If dirname is not provided, get it from the call stack

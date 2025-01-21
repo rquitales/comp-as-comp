@@ -1,1 +1,1 @@
-export {componentProviderHost} from './provider';
+export {componentProviderHost, testSchema} from './provider';

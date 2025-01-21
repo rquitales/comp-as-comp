@@ -24,7 +24,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.componentProviderHost = void 0;
+exports.componentProviderHost = exports.testSchema = void 0;
 const fs_1 = require("fs");
 const pulumi = __importStar(require("@pulumi/pulumi"));
 const provider = __importStar(require("@pulumi/pulumi/provider"));
@@ -63,6 +63,12 @@ class ComponentProvider {
         };
     }
 }
+async function testSchema() {
+    const prov = new ComponentProvider(".");
+    const schema = await prov.getSchema();
+    console.log(JSON.stringify(JSON.parse(schema), null, 2));
+}
+exports.testSchema = testSchema;
 function componentProviderHost(dirname) {
     const args = process.argv.slice(2);
     // If dirname is not provided, get it from the call stack

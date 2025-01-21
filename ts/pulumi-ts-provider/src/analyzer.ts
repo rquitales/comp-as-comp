@@ -10,6 +10,7 @@ type TypeDefinition = {
 
 export type SchemaProperty = {
     type?: string;
+    items?: SchemaProperty;
     ref?: string;  // Reference to a type in typeDefinitions
     optional?: boolean;
     description?: string;
@@ -123,9 +124,14 @@ export class ComponentAnalyzer {
             }
             
             if (elementType) {
-                const elementTypeInfo = this.analyzeType(elementType, schema, parentName);
+                const elementTypeInfo = this.analyzeType(elementType, schema, this.getBaseTypeName(typeString));
                 if (elementTypeInfo.ref) {
-                    return { ref: `${elementTypeInfo.ref}[]` };
+                    return {
+                        type: "array",
+                        items: {
+                            ref: elementTypeInfo.ref
+                        }
+                    };
                 }
                 return { type: `${elementTypeInfo.type}[]` };
             }
@@ -169,29 +175,31 @@ export class ComponentAnalyzer {
         if (type.isClassOrInterface() || (type.flags & ts.TypeFlags.Object)) {
             const properties = type.getProperties();
             if (properties.length > 0) {
-                const typeName = `${parentName}_${this.generateTypeName(typeString)}`;
+                const typeName = this.getBaseTypeName(typeString);
                 
-                const typeDef: TypeDefinition = {
-                    type: "object",
-                    properties: {},
-                };
+                if (!schema.typeDefinitions[typeName]) {
+                    const typeDef: TypeDefinition = {
+                        type: "object",
+                        properties: {},
+                    };
     
-                properties.forEach(prop => {
-                    const declaration = prop.valueDeclaration;
-                    if (declaration) {
-                        const propType = this.checker.getTypeOfSymbolAtLocation(prop, declaration);
-                        const description = declaration && this.getJSDocComment(declaration);
-                        const optional = !!(prop.flags & ts.SymbolFlags.Optional);
-                        
-                        typeDef.properties[prop.name] = {
-                            ...this.analyzeType(propType, schema, typeName),
-                            optional,
-                            ...(description && { description })
-                        };
-                    }
-                });
+                    properties.forEach(prop => {
+                        const declaration = prop.valueDeclaration;
+                        if (declaration) {
+                            const propType = this.checker.getTypeOfSymbolAtLocation(prop, declaration);
+                            const description = declaration && this.getJSDocComment(declaration);
+                            const optional = !!(prop.flags & ts.SymbolFlags.Optional);
+                            
+                            typeDef.properties[prop.name] = {
+                                ...this.analyzeType(propType, schema, typeName),
+                                optional,
+                                ...(description && { description })
+                            };
+                        }
+                    });
     
-                schema.typeDefinitions[typeName] = typeDef;
+                    schema.typeDefinitions[typeName] = typeDef;
+                }
                 return { ref: typeName };
             }
         }
@@ -206,10 +214,13 @@ export class ComponentAnalyzer {
         return primitives.includes(cleanType.toLowerCase());
     }
 
-    private generateTypeName(typeString: string): string {
-        return typeString
-            .replace(/[^a-zA-Z0-9_]/g, '_')
-            .replace(/_+/g, '_');
+    private getBaseTypeName(typeString: string): string {
+        // Remove any generic parameters
+        let baseName = typeString.split('<')[0];
+        // Remove any array brackets
+        baseName = baseName.replace('[]', '');
+        // Clean up any remaining special characters
+        return baseName.replace(/[^a-zA-Z0-9_]/g, '');
     }
 
     private analyzeArgsInterface(node: ts.InterfaceDeclaration, schema: ComponentSchema) {

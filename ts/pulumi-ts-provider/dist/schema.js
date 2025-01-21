@@ -105,7 +105,17 @@ function generateProperty(pkg, inputSchema) {
     if (inputSchema.ref) {
         ref = `#/types/${pkg}:index:${inputSchema.ref}`;
     }
+    else if (inputSchema.type === "array" && inputSchema.items) {
+        // Handle array with items definition
+        if (inputSchema.items.ref) {
+            items = { $ref: `#/types/${pkg}:index:${inputSchema.items.ref}` };
+        }
+        else if (inputSchema.items.type) {
+            items = { type: inputSchema.items.type };
+        }
+    }
     else if (type && type.endsWith("[]")) {
+        // Handle legacy array format
         items = { type: type.slice(0, -2) };
         type = "array";
     }

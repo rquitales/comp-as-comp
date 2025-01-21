@@ -5,6 +5,7 @@ type TypeDefinition = {
 };
 export type SchemaProperty = {
     type?: string;
+    items?: SchemaProperty;
     ref?: string;
     optional?: boolean;
     description?: string;
@@ -25,7 +26,7 @@ export declare class ComponentAnalyzer {
     private getJSDocComment;
     private analyzeType;
     private isPrimitiveType;
-    private generateTypeName;
+    private getBaseTypeName;
     private analyzeArgsInterface;
     private analyzeComponentClass;
     private isPulumiComponent;

@@ -130,12 +130,22 @@ function generateProperty(pkg: string, inputSchema: analyzer.SchemaProperty): sc
     let type = inputSchema.type;
     let items: schema.TypeDefinition | undefined = undefined;
     let ref = undefined;
+
     if (inputSchema.ref) {
         ref = `#/types/${pkg}:index:${inputSchema.ref}`;
+    } else if (inputSchema.type === "array" && inputSchema.items) {
+        // Handle array with items definition
+        if (inputSchema.items.ref) {
+            items = { $ref: `#/types/${pkg}:index:${inputSchema.items.ref}` };
+        } else if (inputSchema.items.type) {
+            items = { type: inputSchema.items.type as schema.Type };
+        }
     } else if (type && type.endsWith("[]")) {
+        // Handle legacy array format
         items = { type: type.slice(0, -2) as schema.Type };
         type = "array";
     }
+
     return {
         description: inputSchema.description,
         type: type,

@@ -102,9 +102,14 @@ class ComponentAnalyzer {
                 elementType = typeRef.typeArguments[0];
             }
             if (elementType) {
-                const elementTypeInfo = this.analyzeType(elementType, schema, parentName);
+                const elementTypeInfo = this.analyzeType(elementType, schema, this.getBaseTypeName(typeString));
                 if (elementTypeInfo.ref) {
-                    return { ref: `${elementTypeInfo.ref}[]` };
+                    return {
+                        type: "array",
+                        items: {
+                            ref: elementTypeInfo.ref
+                        }
+                    };
                 }
                 return { type: `${elementTypeInfo.type}[]` };
             }
@@ -142,25 +147,27 @@ class ComponentAnalyzer {
         if (type.isClassOrInterface() || (type.flags & ts.TypeFlags.Object)) {
             const properties = type.getProperties();
             if (properties.length > 0) {
-                const typeName = `${parentName}_${this.generateTypeName(typeString)}`;
-                const typeDef = {
-                    type: "object",
-                    properties: {},
-                };
-                properties.forEach(prop => {
-                    const declaration = prop.valueDeclaration;
-                    if (declaration) {
-                        const propType = this.checker.getTypeOfSymbolAtLocation(prop, declaration);
-                        const description = declaration && this.getJSDocComment(declaration);
-                        const optional = !!(prop.flags & ts.SymbolFlags.Optional);
-                        typeDef.properties[prop.name] = {
-                            ...this.analyzeType(propType, schema, typeName),
-                            optional,
-                            ...(description && { description })
-                        };
-                    }
-                });
-                schema.typeDefinitions[typeName] = typeDef;
+                const typeName = this.getBaseTypeName(typeString);
+                if (!schema.typeDefinitions[typeName]) {
+                    const typeDef = {
+                        type: "object",
+                        properties: {},
+                    };
+                    properties.forEach(prop => {
+                        const declaration = prop.valueDeclaration;
+                        if (declaration) {
+                            const propType = this.checker.getTypeOfSymbolAtLocation(prop, declaration);
+                            const description = declaration && this.getJSDocComment(declaration);
+                            const optional = !!(prop.flags & ts.SymbolFlags.Optional);
+                            typeDef.properties[prop.name] = {
+                                ...this.analyzeType(propType, schema, typeName),
+                                optional,
+                                ...(description && { description })
+                            };
+                        }
+                    });
+                    schema.typeDefinitions[typeName] = typeDef;
+                }
                 return { ref: typeName };
             }
         }
@@ -172,10 +179,13 @@ class ComponentAnalyzer {
         const primitives = ['string', 'number', 'boolean', 'null', 'undefined'];
         return primitives.includes(cleanType.toLowerCase());
     }
-    generateTypeName(typeString) {
-        return typeString
-            .replace(/[^a-zA-Z0-9_]/g, '_')
-            .replace(/_+/g, '_');
+    getBaseTypeName(typeString) {
+        // Remove any generic parameters
+        let baseName = typeString.split('<')[0];
+        // Remove any array brackets
+        baseName = baseName.replace('[]', '');
+        // Clean up any remaining special characters
+        return baseName.replace(/[^a-zA-Z0-9_]/g, '');
     }
     analyzeArgsInterface(node, schema) {
         node.members.forEach(member => {
