@@ -139,12 +139,19 @@ class ComponentAnalyzer {
                 return this.analyzeType(nonUndefinedType, schema, parentName);
             }
         }
-        // Handle primitive types
-        if (this.isPrimitiveType(typeString)) {
-            return { type: typeString.toLowerCase() };
-        }
-        // Handle interface/object types
+        // Handle dictionary types (index signatures)
         if (type.isClassOrInterface() || (type.flags & ts.TypeFlags.Object)) {
+            const indexInfo = type.getStringIndexType();
+            if (indexInfo) {
+                // This is a dictionary type like { [key: string]: string }
+                const valueTypeInfo = this.analyzeType(indexInfo, schema, parentName);
+                return {
+                    type: "object",
+                    additionalProperties: valueTypeInfo.ref
+                        ? { $ref: `#/types/${valueTypeInfo.ref}` }
+                        : { type: valueTypeInfo.type }
+                };
+            }
             const properties = type.getProperties();
             if (properties.length > 0) {
                 const typeName = this.getBaseTypeName(typeString);
@@ -170,6 +177,10 @@ class ComponentAnalyzer {
                 }
                 return { ref: typeName };
             }
+        }
+        // Handle primitive types
+        if (this.isPrimitiveType(typeString)) {
+            return { type: typeString.toLowerCase() };
         }
         return { type: "unknown" };
     }

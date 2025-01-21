@@ -9,6 +9,11 @@ export type SchemaProperty = {
     ref?: string;
     optional?: boolean;
     description?: string;
+    additionalProperties?: SchemaProperty | {
+        $ref: string;
+    } | {
+        type: string;
+    };
 };
 export type ComponentSchema = {
     description?: string;

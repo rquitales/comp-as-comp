@@ -102,6 +102,7 @@ function generateProperty(pkg, inputSchema) {
     let type = inputSchema.type;
     let items = undefined;
     let ref = undefined;
+    let additionalProperties = undefined;
     if (inputSchema.ref) {
         ref = `#/types/${pkg}:index:${inputSchema.ref}`;
     }
@@ -119,11 +120,21 @@ function generateProperty(pkg, inputSchema) {
         items = { type: type.slice(0, -2) };
         type = "array";
     }
+    // Handle dictionary/map types
+    if (inputSchema.additionalProperties) {
+        if ('ref' in inputSchema.additionalProperties) {
+            additionalProperties = { $ref: `#/types/${pkg}:index:${inputSchema.additionalProperties.ref}` };
+        }
+        else if ('type' in inputSchema.additionalProperties) {
+            additionalProperties = { type: inputSchema.additionalProperties.type };
+        }
+    }
     return {
         description: inputSchema.description,
         type: type,
         items: items,
         $ref: ref,
+        additionalProperties: additionalProperties,
     };
 }
 //# sourceMappingURL=schema.js.map
