@@ -1,35 +1,25 @@
 import json
-from typing import Optional
+from typing import Optional, TypedDict
 
-from pulumi import Inputs, ResourceOptions
-from pulumi_aws import s3
 import pulumi
+from pulumi import ResourceOptions
+from pulumi_aws import s3
 
 
-class StaticPageArgs:
-
+class StaticPageArgs(TypedDict):
     index_content: pulumi.Input[str]
     """The HTML content for index.html."""
 
-    @staticmethod
-    def from_inputs(inputs: Inputs) -> 'StaticPageArgs':
-        return StaticPageArgs(index_content=inputs['indexContent'])
-
-    def __init__(self, index_content: pulumi.Input[str]) -> None:
-        self.index_content = index_content
-
 
 class StaticPage(pulumi.ComponentResource):
-    bucket: s3.Bucket
     website_url: pulumi.Output[str]
 
     def __init__(self,
                  name: str,
                  args: StaticPageArgs,
-                 props: Optional[dict] = None,
                  opts: Optional[ResourceOptions] = None) -> None:
 
-        super().__init__('python-components:index:StaticPage', name, props, opts)
+        super().__init__('python-components:index:StaticPage', name, {}, opts)
 
         # Create a bucket and expose a website index document.
         bucket = s3.Bucket(
@@ -42,7 +32,7 @@ class StaticPage(pulumi.ComponentResource):
             f'{name}-index-object',
             bucket=bucket.bucket,
             key='index.html',
-            content=args.index_content,
+            content=args.get("index_content"),
             content_type='text/html',
             opts=ResourceOptions(parent=bucket))
 
@@ -53,11 +43,9 @@ class StaticPage(pulumi.ComponentResource):
             policy=bucket.bucket.apply(_allow_getobject_policy),
             opts=ResourceOptions(parent=bucket))
 
-        self.bucket = bucket
         self.website_url = bucket.website_endpoint
 
         self.register_outputs({
-            'bucket': bucket,
             'websiteUrl': bucket.website_endpoint,
         })
 
