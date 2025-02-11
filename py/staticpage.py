@@ -13,6 +13,7 @@ class StaticPageArgs(TypedDict):
 
 class StaticPage(pulumi.ComponentResource):
     website_url: pulumi.Output[str]
+    """The URL of the static website."""
 
     def __init__(self,
                  name: str,
@@ -45,6 +46,9 @@ class StaticPage(pulumi.ComponentResource):
 
         self.website_url = bucket.website_endpoint
 
+        # By registering the outputs on which the component depends, we ensure
+        # that the Pulumi CLI will wait for all the outputs to be created before
+        # considering the component itself to have been created.
         self.register_outputs({
             'websiteUrl': bucket.website_endpoint,
         })
