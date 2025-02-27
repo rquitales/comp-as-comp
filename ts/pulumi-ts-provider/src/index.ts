@@ -1,1 +1,0 @@
-export {componentProviderHost, testSchema} from './provider';
