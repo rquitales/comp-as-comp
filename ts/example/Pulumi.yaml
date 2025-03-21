@@ -1,9 +1,7 @@
 name: cert-component-yaml
 runtime: yaml
-plugins:
-  providers:
-    - name: node-components
-      path: ..
+packages:
+  node-components: ../
 resources:
   mycert:
     type: node-components:SelfSignedCertificate
@@ -13,4 +11,3 @@ resources:
       localValidityPeriodHours: 24
       subject:
         organization: Example Org
-
