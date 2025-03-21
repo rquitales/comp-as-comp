@@ -1,0 +1,15 @@
+name: cert-component-yaml
+runtime: yaml
+packages:
+  yaml-components: ../
+resources:
+  mycert:
+    type: yaml-components:SelfSignedCertificate
+    properties:
+      dnsName: example.com
+      validityPeriodHours: 24
+      localValidityPeriodHours: 24
+outputs:
+  pem: ${mycert.pem}
+  privateKey: ${mycert.privateKey}
+  caCert: ${mycert.caCert}

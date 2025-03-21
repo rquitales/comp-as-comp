@@ -1,0 +1,72 @@
+runtime: yaml
+name: yaml-components
+components:
+  SelfSignedCertificate:
+    inputs:
+      algorithm:
+        type: string
+        default: RSA
+      ecdsaCurve:
+        type: string
+        default: P224
+      dnsName:
+        type: string
+      validityPeriodHours:
+        type: integer
+      localValidityPeriodHours:
+        type: integer
+    resources:
+      ca:
+        type: tls:index/privateKey:PrivateKey
+        properties:
+          algorithm: ${algorithm}
+          ecdsaCurve: ${ecdsaCurve}
+          rsaBits: 2048
+      caCert:
+        type: tls:index/selfSignedCert:SelfSignedCert
+        properties:
+          privateKeyPem: ${ca.privateKeyPem}
+          isCaCertificate: true
+          validityPeriodHours: ${validityPeriodHours}
+          subject:
+            organization: Example Org
+          allowedUses:
+            - key_encipherment
+            - digital_signature
+        options:
+          parent: ${ca}
+      privateKey:
+        type: tls:index/privateKey:PrivateKey
+        properties:
+          algorithm: ${algorithm}
+          ecdsaCurve: ${ecdsaCurve}
+          rsaBits: 2048
+        options:
+          parent: ${ca}
+      certRequest:
+        type: tls:index/certRequest:CertRequest
+        properties:
+          privateKeyPem: ${privateKey.privateKeyPem}
+          dnsNames:
+            - ${dnsName}
+          subject:
+            organization: Example Org
+            commonName: ${dnsName}
+        options:
+          parent: ${privateKey}
+      cert:
+        type: tls:index/locallySignedCert:LocallySignedCert
+        properties:
+          certRequestPem: ${certRequest.certRequestPem}
+          caPrivateKeyPem: ${ca.privateKeyPem}
+          caCertPem: ${caCert.certPem}
+          validityPeriodHours: ${localValidityPeriodHours}
+          allowedUses:
+            - key_encipherment
+            - digital_signature
+        options:
+          parent: ${certRequest}
+    outputs:
+      pem: ${cert.certPem}
+      privateKey: ${privateKey.privateKeyPem}
+      caCert: ${caCert.certPem}
