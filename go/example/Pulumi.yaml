@@ -9,6 +9,6 @@ resources:
   myrandom:
     type: go-components:RandomComponent
     properties:
-      length: 10
+      length: 3
 outputs:
   password: ${myrandom.password}
