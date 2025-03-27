@@ -369,10 +369,10 @@
   resolved "https://registry.yarnpkg.com/@protobufjs/utf8/-/utf8-1.1.0.tgz#a777360b5b39a1a2e5106f8e858f2fd2d060c570"
   integrity sha512-Vvn3zZrhQZkkBE8LSuW3em98c0FwgO4nxzv6OdSxPKJIEKY2bGbHn+mhGIPerzI4twdxaP8/0+06HBpwf345Lw==
 
-"@pulumi/pulumi@3.159.0-alpha.x11c7234":
-  version "3.159.0-alpha.x11c7234"
-  resolved "https://registry.yarnpkg.com/@pulumi/pulumi/-/pulumi-3.159.0-alpha.x11c7234.tgz#dbcaf2f654eee3f428dbbb7a5148d5c1895e40c5"
-  integrity sha512-zz+FgQOfXXe09tEH0pef+gEdLnpzRep9WJtmdtqdRgY9Nr8vIbpYxLwtNFm3yc4021MTnAlRmDVcQWNKKg++iQ==
+"@pulumi/pulumi@^3.0.0":
+  version "3.147.0"
+  resolved "https://registry.yarnpkg.com/@pulumi/pulumi/-/pulumi-3.147.0.tgz#b118b353fadfe9ee0705d81d38f772caa9bd1b2b"
+  integrity sha512-5tBGauFC6rAiB5I8Ug6kHBNB1YNmLANT1yy2pXwyMMWXmFc1++sYrZ2QDyVf0cJVtXdFhqw1kw/CxdV4YCHi0Q==
   dependencies:
     "@grpc/grpc-js" "^1.10.1"
     "@logdna/tail-file" "^2.0.6"
@@ -384,6 +384,7 @@
     "@opentelemetry/resources" "^1.28"
     "@opentelemetry/sdk-trace-base" "^1.28"
     "@opentelemetry/sdk-trace-node" "^1.28"
+    "@opentelemetry/semantic-conventions" "^1.28"
     "@pulumi/query" "^0.3.0"
     "@types/google-protobuf" "^3.15.5"
     "@types/semver" "^7.5.6"
@@ -404,10 +405,10 @@
     tmp "^0.2.1"
     upath "^1.1.0"
 
-"@pulumi/pulumi@^3.0.0":
-  version "3.147.0"
-  resolved "https://registry.yarnpkg.com/@pulumi/pulumi/-/pulumi-3.147.0.tgz#b118b353fadfe9ee0705d81d38f772caa9bd1b2b"
-  integrity sha512-5tBGauFC6rAiB5I8Ug6kHBNB1YNmLANT1yy2pXwyMMWXmFc1++sYrZ2QDyVf0cJVtXdFhqw1kw/CxdV4YCHi0Q==
+"@pulumi/pulumi@^3.159.0":
+  version "3.159.0"
+  resolved "https://registry.yarnpkg.com/@pulumi/pulumi/-/pulumi-3.159.0.tgz#82cf8e5e048f6526968a7eece361aa009d0feb83"
+  integrity sha512-ochBFHh8ZePwDwxPKx1IBsDPZ4h2Q1HB7pfh8sKhP8OEpQD+TASLGT7fE015B5kjeHRlwCusyNSexKXDByl0FQ==
   dependencies:
     "@grpc/grpc-js" "^1.10.1"
     "@logdna/tail-file" "^2.0.6"
@@ -419,7 +420,6 @@
     "@opentelemetry/resources" "^1.28"
     "@opentelemetry/sdk-trace-base" "^1.28"
     "@opentelemetry/sdk-trace-node" "^1.28"
-    "@opentelemetry/semantic-conventions" "^1.28"
     "@pulumi/query" "^0.3.0"
     "@types/google-protobuf" "^3.15.5"
     "@types/semver" "^7.5.6"
