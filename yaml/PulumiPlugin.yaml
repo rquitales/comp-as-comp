@@ -70,3 +70,61 @@ components:
       pem: ${cert.certPem}
       privateKey: ${privateKey.privateKeyPem}
       caCert: ${caCert.certPem}
+
+  StaticPage:
+    inputs:
+      indexContent:
+        type: string
+    resources:
+      bucket:
+        type: aws:s3/bucketV2:BucketV2
+        properties: {}
+      
+      bucketWebsite:
+        type: aws:s3/bucketWebsiteConfigurationV2:BucketWebsiteConfigurationV2
+        properties:
+          bucket: ${bucket.bucket}
+          indexDocument:
+            suffix: index.html
+        options:
+          parent: ${bucket}
+
+      bucketObject:
+        type: aws:s3/bucketObject:BucketObject
+        properties:
+          bucket: ${bucket.bucket}
+          key: index.html
+          content: ${indexContent}
+          contentType: text/html
+        options:
+          parent: ${bucket}
+
+      publicAccessBlock:
+        type: aws:s3/bucketPublicAccessBlock:BucketPublicAccessBlock
+        properties:
+          bucket: ${bucket.id}
+          blockPublicAcls: false
+        options:
+          parent: ${bucket}
+
+      bucketPolicy:
+        type: aws:s3/bucketPolicy:BucketPolicy
+        properties:
+          bucket: ${bucket.id}
+          policy:
+            fn::toJSON:
+              Version: "2012-10-17"
+              Statement:
+                - Effect: Allow
+                  Principal: "*"
+                  Action:
+                    - s3:GetObject
+                  Resource:
+                    - arn:aws:s3:::${bucket.bucket}/*
+        options:
+          parent: ${bucket}
+          dependsOn:
+            - ${publicAccessBlock}
+
+    outputs:
+      endpoint: ${bucketWebsite.websiteEndpoint}

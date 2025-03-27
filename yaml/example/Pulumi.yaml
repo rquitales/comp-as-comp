@@ -3,6 +3,10 @@ runtime: yaml
 packages:
   yaml-components: ../
 resources:
+  mypage:
+    type: yaml-components:StaticPage
+    properties:
+      indexContent: "Hello, World!"
   mycert:
     type: yaml-components:SelfSignedCertificate
     properties:
@@ -10,6 +14,7 @@ resources:
       validityPeriodHours: 24
       localValidityPeriodHours: 24
 outputs:
+  endpoint: ${mypage.endpoint}
   pem: ${mycert.pem}
   privateKey: ${mycert.privateKey}
   caCert: ${mycert.caCert}
