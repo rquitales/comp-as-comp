@@ -13,7 +13,6 @@
         "forceConsistentCasingInFileNames": true
     },
     "files": [
-        "index.ts",
-        "selfSignedCert.ts"
+        "index.ts"
     ]
 }

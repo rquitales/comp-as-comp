@@ -2,7 +2,7 @@
     "name": "node-components",
     "description": "Node Sample Components",
     "dependencies": {
-        "@pulumi/pulumi": "^3.157.0",
+        "@pulumi/pulumi": "3.159.0-alpha.x11c7234",
         "@pulumi/tls": "^4.6.1"
     },
     "devDependencies": {
