@@ -1,7 +1,5 @@
 from pulumi.provider.experimental import Metadata, component_provider_host
+from staticpage import StaticPage
 
 if __name__ == "__main__":
-    # Call the component provider host. This will discover any ComponentResource
-    # subclasses in this package, infer their schema and host a provider that
-    # allows constructing these components from a Pulumi program.
-    component_provider_host(Metadata("python-components", "0.1.0"))
+    component_provider_host(metadata=Metadata("python-components"), components=[StaticPage])
