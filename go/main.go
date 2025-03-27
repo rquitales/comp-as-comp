@@ -10,6 +10,7 @@ func main() {
 		WithNamespace("mikhailshilkov").
 		WithComponents(
 			infer.Component(NewRandomComponent),
+			infer.Component(NewStaticPage),
 		).
 		BuildAndRun()
 
