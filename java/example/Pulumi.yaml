@@ -1,0 +1,13 @@
+name: static-page-component-yaml
+runtime: yaml
+plugins:
+  providers:
+    - name: java-components
+      path: ..
+resources:
+  myrandom:
+    type: java-components:StaticPage
+    properties:
+      indexContent: "Hello, World!"
+outputs:
+  endpoint: ${myrandom.endpoint}
